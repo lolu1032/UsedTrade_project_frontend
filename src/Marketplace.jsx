@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import axios from "axios"
 import LocationSelector from "./LocationSelector"
+import SideMenu from "./Side"
 
 const Marketplace = () => {
   const [products, setProducts] = useState([])
@@ -14,54 +16,8 @@ const Marketplace = () => {
   const [currentLocation, setCurrentLocation] = useState("서울시 강남구 신사동")
   const [sideMenuOpen, setSideMenuOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
-
-  // Dummy products for testing when API is not available
-  const dummyProducts = [
-    {
-      id: 1,
-      title: "아이폰 13 프로 맥스 256GB 그래파이트",
-      price: 950000,
-      location: "도원동",
-      views: 128,
-      imageUrl: "https://via.placeholder.com/300",
-      description: "애플 정품. 2022년 3월 구매, 배터리 효율 89%. 케이스, 충전기 포함. 기스 없이 깨끗하게 사용했습니다.",
-      seller: "애플러버",
-      createdAt: "2024-01-15"
-    },
-    {
-      id: 2,
-      title: "갤럭시 S22 울트라 512GB 팬텀블랙",
-      price: 850000,
-      location: "도원동",
-      views: 95,
-      imageUrl: "https://via.placeholder.com/300",
-      description: "삼성전자 갤럭시 S22 울트라 512GB 팬텀블랙 색상입니다. S펜 기능 완벽합니다. 약간의 네고 가능합니다. 직거래 선호합니다.",
-      seller: "갤럭시팬",
-      createdAt: "2024-02-03"
-    },
-    {
-      id: 3,
-      title: "맥북 프로 M1 13인치 512GB",
-      price: 1250000,
-      location: "도원동",
-      views: 210,
-      imageUrl: "https://via.placeholder.com/300",
-      description: "맥북 프로 M1 13인치 512GB SSD 모델입니다. 사용 기간 1년 미만, 충전 사이클 87회입니다. 상태 매우 좋습니다. 박스, 충전기 모두 있습니다.",
-      seller: "맥북사랑",
-      createdAt: "2024-01-28"
-    },
-    {
-      id: 4,
-      title: "애플워치 시리즈 7 GPS 41mm",
-      price: 320000,
-      location: "도원동",
-      views: 76,
-      imageUrl: "https://via.placeholder.com/300",
-      description: "애플워치 시리즈 7 GPS 41mm 스타라이트 색상입니다. 구매 6개월 됐습니다. 보호필름 부착해서 사용해서 기스 없습니다. 충전기, 스트랩 포함입니다.",
-      seller: "워치매니아",
-      createdAt: "2024-02-10"
-    },
-  ]
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authModalView, setAuthModalView] = useState("login")
 
   useEffect(() => {
     fetchProducts()
@@ -144,6 +100,18 @@ const Marketplace = () => {
     setSelectedProduct(null)
   }
 
+  // 인증 모달 열기
+  const openAuthModal = (view = "login") => {
+    setAuthModalView(view)
+    setAuthModalOpen(true)
+    setSideMenuOpen(false) // 사이드 메뉴 닫기
+  }
+
+  // 인증 모달 닫기
+  const closeAuthModal = () => {
+    setAuthModalOpen(false)
+  }
+
   // 상품 세부 정보 페이지 컴포넌트
   const ProductDetail = ({ product, onClose }) => {
     return (
@@ -151,38 +119,77 @@ const Marketplace = () => {
         <div className="sticky top-0 bg-white z-10">
           <div className="flex justify-between items-center p-4 border-b">
             <button onClick={onClose} className="text-2xl">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div className="flex space-x-4">
               <button>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
                 </svg>
               </button>
               <button>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                  />
                 </svg>
               </button>
               <button>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-        
-        <div className="bg-gray-200 w-full" style={{ height: '300px' }}>
+
+        <div className="bg-gray-200 w-full" style={{ height: "300px" }}>
           <img
             src={product.imageUrl || "/placeholder.svg"}
             alt={product.title}
             className="w-full h-full object-contain"
           />
         </div>
-        
+
         <div className="p-4">
           <div className="flex items-center space-x-2 mb-4">
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
@@ -193,32 +200,43 @@ const Marketplace = () => {
               <p className="text-sm text-gray-500">{product.location || "위치 정보 없음"}</p>
             </div>
           </div>
-          
+
           <h1 className="text-xl font-bold mb-2">{product.title}</h1>
-          <p className="text-sm text-gray-500 mb-2">{product.category || "중고거래"} • {product.createdAt || "등록일 정보 없음"}</p>
-          
+          <p className="text-sm text-gray-500 mb-2">
+            {product.category || "중고거래"} • {product.createdAt || "등록일 정보 없음"}
+          </p>
+
           <p className="text-lg font-bold mb-4">{product.price?.toLocaleString() || "0"}원</p>
-          
+
           <div className="border-t border-b py-4 mb-4">
             <p>{product.description || "상품 설명이 없습니다."}</p>
           </div>
-          
+
           <div className="flex justify-between text-sm text-gray-500">
             <span>관심 {product.likes || 0}</span>
             <span>조회 {product.views || 0}</span>
           </div>
         </div>
-        
+
         <div className="fixed bottom-0 left-0 right-0 border-t bg-white p-4 flex justify-between items-center">
           <button className="flex items-center justify-center w-12 h-12">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
             </svg>
           </button>
           <div className="flex-1 ml-4">
-            <button className="bg-orange-500 text-white w-full py-3 rounded-md font-bold">
-              채팅하기
-            </button>
+            <button className="bg-orange-500 text-white w-full py-3 rounded-md font-bold">채팅하기</button>
           </div>
         </div>
       </div>
@@ -226,82 +244,39 @@ const Marketplace = () => {
   }
 
   // 사이드 메뉴 컴포넌트
-  const SideMenu = ({ isOpen, onClose }) => {
-    const menuItems = [
-      { id: 1, name: "홈", icon: "home" },
-      { id: 2, name: "내 근처", icon: "location" },
-      { id: 3, name: "채팅", icon: "chat" },
-      { id: 4, name: "관심목록", icon: "heart" },
-      { id: 5, name: "나의 좋은거래", icon: "user" },
-      { id: 6, name: "동네생활", icon: "community" },
-      { id: 7, name: "중고거래 인증", icon: "verify" },
-      { id: 8, name: "알림", icon: "notification" },
-      { id: 9, name: "설정", icon: "settings" },
-    ]
+  <SideMenu />
 
-    return (
-      <>
-        {/* 오버레이 */}
-        {isOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={onClose}
-          ></div>
+  // 인증 모달 컴포넌트
+  const AuthModal = () => {
+    if (!authModalOpen) return null
+
+    return createPortal(
+      <div className="fixed inset-0 z-50">
+        {authModalView === "login" ? (
+          <Login onClose={closeAuthModal} switchView={() => setAuthModalView("signup")} />
+        ) : (
+          <Signup onClose={closeAuthModal} switchView={() => setAuthModalView("login")} />
         )}
-        
-        {/* 사이드 메뉴 */}
-        <div
-          className={`fixed top-0 right-0 w-64 h-full bg-white z-50 transform transition-transform duration-300 ease-in-out ${
-            isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex justify-end p-4 border-b">
-            <button onClick={onClose}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          <div className="p-4">
-            <div className="flex items-center space-x-3 mb-6 p-2">
-              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold">로그인/회원가입</p>
-                <p className="text-sm text-gray-500">계정을 만들어 보세요</p>
-              </div>
-            </div>
-            
-            <ul>
-              {menuItems.map((item) => (
-                <li key={item.id} className="py-3 border-b">
-                  <a href="#" className="flex items-center">
-                    <div className="w-6 h-6 mr-4"></div>
-                    <span>{item.name}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </>
+      </div>,
+      document.body,
     )
   }
 
   return (
     <div className="max-w-screen-md mx-auto bg-gray-50 min-h-screen relative">
       {/* Side Menu */}
-      <SideMenu isOpen={sideMenuOpen} onClose={() => setSideMenuOpen(false)} />
-      
+      <SideMenu
+        isOpen={sideMenuOpen}
+        onClose={() => setSideMenuOpen(false)}
+        onLoginClick={() => openAuthModal("login")}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal />
+
       {/* Product Detail */}
-      {selectedProduct && (
-        <ProductDetail product={selectedProduct} onClose={closeProductDetail} />
-      )}
-      
+      {selectedProduct && <ProductDetail product={selectedProduct} onClose={closeProductDetail} />}
+
       {/* Header */}
       <header className="flex justify-between items-center p-4">
         <div className="flex items-center">
@@ -398,10 +373,10 @@ const Marketplace = () => {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {/* Use API data if available, otherwise use dummy data for testing */}
-            {(products.length > 0 ? products : dummyProducts).map((product) => (
-              <div 
-                key={product.id} 
-                className="border border-gray-200 rounded-md overflow-hidden cursor-pointer" 
+            {(products.length > 0 ? products : []).map((product) => (
+              <div
+                key={product.id}
+                className="border border-gray-200 rounded-md overflow-hidden cursor-pointer"
                 onClick={() => openProductDetail(product)}
               >
                 <div className="relative pt-[100%] bg-gray-200">
@@ -472,3 +447,4 @@ const Marketplace = () => {
 }
 
 export default Marketplace
+
