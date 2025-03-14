@@ -1,5 +1,5 @@
 import './App.css'
-import Marketplace from './Marketplace'
+import Marketplace from './component'
 
 function App() {
 
