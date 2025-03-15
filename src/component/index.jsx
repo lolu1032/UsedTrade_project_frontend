@@ -90,6 +90,7 @@ const Marketplace = () => {
 
   const closeProductDetail = () => {
     setSelectedProduct(null)
+    fetchProducts(); 
   }
 
   const openAuthModal = (view = "login") => {
@@ -100,6 +101,10 @@ const Marketplace = () => {
 
   const closeAuthModal = () => {
     setAuthModalOpen(false)
+  }
+
+  const switchAuthModalView = (view) => {
+    setAuthModalView(view)
   }
 
   return (
@@ -116,7 +121,7 @@ const Marketplace = () => {
         <AuthModal 
           view={authModalView}
           onClose={closeAuthModal}
-          onSwitchView={(view) => setAuthModalView(view)}
+          onSwitchView={switchAuthModalView}
         />
       )}
 

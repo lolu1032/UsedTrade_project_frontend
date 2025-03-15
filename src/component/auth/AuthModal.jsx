@@ -1,7 +1,6 @@
-// components/marketplace/AuthModal.js
-import { createPortal } from "react-dom"
-import LoginForm from "./LoginForm"
-import SignupForm from "./SignupForm"
+import { createPortal } from "react-dom";
+import LoginForm from "./LoginForm";
+import SignupForm from "./SignupForm";
 
 const AuthModal = ({ view, onClose, onSwitchView }) => {
   return createPortal(
@@ -19,7 +18,7 @@ const AuthModal = ({ view, onClose, onSwitchView }) => {
       )}
     </div>,
     document.body
-  )
-}
+  );
+};
 
-export default AuthModal
+export default AuthModal;

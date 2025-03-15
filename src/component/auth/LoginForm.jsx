@@ -1,4 +1,3 @@
-// components/marketplace/LoginForm.js
 import { useState } from 'react';
 
 const LoginForm = ({ onClose, switchView }) => {
@@ -34,7 +33,18 @@ const LoginForm = ({ onClose, switchView }) => {
       if (!response.ok) {
         throw new Error('로그인에 실패했습니다.');
       }
-      alert("로그인 성공")
+      
+      // Assuming the response contains accessToken and username
+      const data = await response.json();
+      
+      // Store in localStorage
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('username', data.username);
+      
+      // Notify parent components about successful login
+      window.dispatchEvent(new Event('user-login'));
+      
+      alert("로그인 성공");
       onClose();
     } catch (err) {
       setError(err.message);
