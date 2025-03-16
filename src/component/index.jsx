@@ -21,10 +21,56 @@ const Marketplace = () => {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalView, setAuthModalView] = useState("login")
+  const [isSearchMode, setIsSearchMode] = useState(false)
+  const [searchKeyword, setSearchKeyword] = useState("")
 
   useEffect(() => {
-    fetchProducts()
-  }, [currentPage, currentLocation])
+    if (isSearchMode && searchKeyword.trim()) {
+      fetchSearchResults();
+    } else {
+      // If not in search mode or search keyword is empty, reset to normal product list
+      if (isSearchMode && !searchKeyword.trim()) {
+        setIsSearchMode(false);
+      }
+      fetchProducts();
+    }
+  }, [currentPage, currentLocation, isSearchMode, searchKeyword]);
+
+  const fetchSearchResults = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/api/search', {
+        params: {
+          keyword: searchKeyword,
+          page: currentPage,
+          size: 8
+        }
+      });
+
+      if (response.data && response.data.content) {
+        // Ensure all products have proper image URLs
+        const productsWithImages = response.data.content.map(product => {
+          if (!product.imageUrl || product.imageUrl === "") {
+            return { ...product, imageUrl: "/placeholder.svg" };
+          }
+          return product;
+        });
+        
+        setProducts(productsWithImages);
+        setTotalPages(response.data.totalPages);
+      } else {
+        console.error("Unexpected API response format:", response.data);
+        setProducts([]);
+        setTotalPages(0);
+      }
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setProducts([]);
+      setTotalPages(0);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -38,26 +84,55 @@ const Marketplace = () => {
       })
 
       if (response.data && response.data.content) {
-        setProducts(response.data.content)
-        setTotalPages(response.data.totalPages)
+        // Ensure all products have proper image URLs
+        const productsWithImages = response.data.content.map(product => {
+          if (!product.imageUrl || product.imageUrl === "") {
+            return { ...product, imageUrl: "/placeholder.svg" };
+          }
+          return product;
+        });
+        
+        setProducts(productsWithImages);
+        setTotalPages(response.data.totalPages);
       } else {
-        console.error("Unexpected API response format:", response.data)
-        setProducts([])
-        setTotalPages(5) // For demo purposes
+        console.error("Unexpected API response format:", response.data);
+        setProducts([]);
+        setTotalPages(5); // For demo purposes
       }
     } catch (error) {
-      console.error("Error fetching products:", error)
-      setProducts([])
-      setTotalPages(5) // For demo purposes
+      console.error("Error fetching products:", error);
+      setProducts([]);
+      setTotalPages(5); // For demo purposes
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleSearch = (e) => {
-    e.preventDefault()
-    fetchProducts()
-  }
+  const handleSearch = (e, searchData) => {
+    e.preventDefault();
+    
+    if (searchData) {
+      // If searchData is provided, use it directly
+      const productsWithImages = searchData.content.map(product => {
+        if (!product.imageUrl || product.imageUrl === "") {
+          return { ...product, imageUrl: "/placeholder.svg" };
+        }
+        return product;
+      });
+      
+      setProducts(productsWithImages);
+      setTotalPages(searchData.totalPages);
+      setCurrentPage(0);
+      setIsSearchMode(true);
+      setSearchKeyword(searchData.keyword);
+    } else {
+      // If no searchData or empty search, reset to normal mode
+      setIsSearchMode(false);
+      setSearchKeyword("");
+      setCurrentPage(0);
+      fetchProducts();
+    }
+  };
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category)
@@ -65,8 +140,10 @@ const Marketplace = () => {
   }
 
   const handlePageChange = (newPage) => {
-    setCurrentPage(newPage)
-  }
+    setCurrentPage(newPage);
+    // Scroll to top when changing page
+    window.scrollTo(0, 0);
+  };
 
   const handleLocationChange = (newLocation) => {
     let formattedLocation = newLocation.replace("특별시", "시").replace("광역시", "시")
@@ -78,6 +155,11 @@ const Marketplace = () => {
 
     setCurrentLocation(formattedLocation)
     setCurrentPage(0)
+    
+    // When location changes, exit search mode
+    setIsSearchMode(false);
+    setSearchKeyword("");
+    setSearchTerm("");
   }
 
   const toggleSideMenu = () => {
@@ -90,7 +172,11 @@ const Marketplace = () => {
 
   const closeProductDetail = () => {
     setSelectedProduct(null)
-    fetchProducts(); 
+    if (isSearchMode) {
+      fetchSearchResults();
+    } else {
+      fetchProducts();
+    }
   }
 
   const openAuthModal = (view = "login") => {
@@ -151,12 +237,14 @@ const Marketplace = () => {
       <div className="flex items-center text-sm px-4 py-2 text-gray-500">
         <span>홈</span>
         <span className="mx-1">{">"}</span>
-        <span className="font-medium text-black">중고거래</span>
+        <span className="font-medium text-black">{isSearchMode ? "검색결과" : "중고거래"}</span>
       </div>
 
       {/* Title - 현재 선택된 위치 표시 */}
       <div className="px-4 py-2">
-        <h1 className="text-2xl font-bold">{currentLocation}</h1>
+        <h1 className="text-2xl font-bold">
+          {isSearchMode ? `"${searchKeyword}" 검색결과` : currentLocation}
+        </h1>
       </div>
 
       {/* Filter */}
