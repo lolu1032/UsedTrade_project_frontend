@@ -22,7 +22,7 @@ const SearchBar = ({ searchTerm, selectedCategory, onSearchChange, onSearch }) =
         params: {
           keyword: searchTerm,
           page: 0,
-          size: 8
+          size: 4
         }
       });
       

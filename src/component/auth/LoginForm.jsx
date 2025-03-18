@@ -40,6 +40,7 @@ const LoginForm = ({ onClose, switchView }) => {
       // Store in localStorage
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('username', data.username);
+      localStorage.setItem('id', data.id)
       
       // Notify parent components about successful login
       window.dispatchEvent(new Event('user-login'));

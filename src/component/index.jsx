@@ -43,7 +43,7 @@ const Marketplace = () => {
         params: {
           keyword: searchKeyword,
           page: currentPage,
-          size: 8
+          size: 4
         }
       });
 
@@ -78,7 +78,7 @@ const Marketplace = () => {
       const response = await axios.get(`/boards/products`, {
         params: {
           page: currentPage,
-          size: 8,
+          size: 4,
           location: currentLocation,
         },
       })
