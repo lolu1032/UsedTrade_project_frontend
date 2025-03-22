@@ -8,8 +8,16 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  define: {
+    global: 'window',
+  },
   server: {
     proxy: {
+      '/ws-stomp': {
+        target: 'http://localhost:8080',  // Spring 백엔드 서버 주소
+        ws: true,  // WebSocket 프록시 활성화
+        changeOrigin: true
+      },
       '/boards': {
         target: 'http://localhost:8080',
         changeOrigin: true,
