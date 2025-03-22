@@ -1,22 +1,42 @@
-# 메인화면
-<img src="https://github.com/user-attachments/assets/595e7a9b-ce70-47dc-9081-aa6f3f5e04e3" width="200"/>
-<img src="https://github.com/user-attachments/assets/f9e8504d-b1df-4592-99e4-08b122d7dbcd" width="200"/>
+# 이 프로젝트는 React와 Spring Boot를 이용한 중고 거래 플랫폼입니다.
 
-# 헤더 GPS
+## 목차
+- [기능](#기능)
+- [기술 스택](#기술-스택)
+- [설치 방법](#설치-방법)
+- [화면](#화면)
+## 기능
+- 로그인 / 회원가입
+- 좋아요
+- 채팅
+- 상품 검색
+- 위치 검색
 
-<img src="https://github.com/user-attachments/assets/4063b0fa-64f9-4589-931e-6d27cf37e746" width="200"/>
-<img src="https://github.com/user-attachments/assets/fc308bc5-d081-4db1-a85a-e5e17c61c0b1" width="200"/>
+## 기술 스택
+- Frontend: React
+- Backend: Spring Boot, JPA, WebSocket
+- Database: postgreSQL,Redis
 
-# 로그인 / 회원가입
+## 설치 방법
+1. 이 레포지토리를 클론합니다:
+   ```bash
+   git clone https://github.com/lolu1032/UsedTrade_project_frontend.git
 
-<img src="https://github.com/user-attachments/assets/d870a310-142b-465c-a153-63b3f85d8997" width="200"/>
-<img src="https://github.com/user-attachments/assets/610e615c-18be-4ffc-bbb6-4ee0285c2eaa" width="200"/>
+## 화면
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+  <img src="https://github.com/user-attachments/assets/f5708203-cf94-4da6-b472-20fbba37fd2a" width="140" />
+  <img src="https://github.com/user-attachments/assets/a7dde44d-2c45-4b49-a39a-20d082472380" width="140" />
+  <img src="https://github.com/user-attachments/assets/2377c6bd-4a98-4526-a66a-9bf680bde5a4" width="140" />
+  <img src="https://github.com/user-attachments/assets/e4cf9cba-8f71-4828-998f-2bbf32da2964" width="140" />
+  <img src="https://github.com/user-attachments/assets/8f12df0b-018d-4f2d-8be3-c82d8c58a5b5" width="140" />
+  <img src="https://github.com/user-attachments/assets/05274733-8d77-4d08-96a3-6fcfcf803472" width="140" />
+  <img src="https://github.com/user-attachments/assets/2772df26-f091-4c87-b7f9-39e8b30d3abb" width="140" />
+</div>
 
-# 검색
 
-<img src="https://github.com/user-attachments/assets/c8212834-f321-49fa-95ae-148a1dd59507" width="200"/>
 
-# 상세페이지와 좋아요
-<img src="https://github.com/user-attachments/assets/0e6dd9f0-96e7-4a77-a438-100cfa13b4f8" width="200"/>
-<img src="https://github.com/user-attachments/assets/6020d87a-025f-4e3f-90e3-1b88cea63667" width="200"/>
-<img src="https://github.com/user-attachments/assets/fd78c99e-71ab-4204-8cbc-42550ef962a5" width="200"/>
+
+
+
+
+
