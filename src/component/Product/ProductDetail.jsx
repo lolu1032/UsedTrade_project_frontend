@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ChatButton, Chat } from "../Chat"; // Import the updated chat components
+import { ChatButton, Chat } from "../Chat/index";
 
 const ProductDetail = ({ product: initialProduct, onClose }) => {
   const [product, setProduct] = useState(initialProduct);
@@ -23,17 +23,21 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
         const response = await axios.get(`/boards/products/${initialProduct.id}`);
         if (response.data) {
           setProduct(response.data);
-
-          // ✅ 로그인 되어있다면 좋아요 상태 확인
+    
+          // 로그인 체크 후 좋아요 상태 조회 시도
           const token = localStorage.getItem("accessToken");
           if (token) {
             const userId = localStorage.getItem("id");
-            const likeResponse = await axios.get(`/api/like`, {
-              params: { userId: userId, productId: initialProduct.id }
-            });
-
-            // ✅ 서버에서 받은 status 값으로 좋아요 상태 반영
-            setIsLiked(likeResponse.data.status === true);
+    
+            try {
+              const likeResponse = await axios.get(`/api/like`, {
+                params: { userId, productId: initialProduct.id }
+              });
+              setIsLiked(likeResponse.data.status === true);
+            } catch (likeError) {
+              console.warn("좋아요 상태 확인 실패 - 무시하고 진행", likeError);
+              setIsLiked(false);  // 실패 시 기본값 false
+            }
           }
         }
       } catch (error) {

@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import ChatRoomList from './Chat/ChatRoomList';
 
 const SideMenu = ({ isOpen, onClose, onLoginClick }) => {
   const [username, setUsername] = useState(null);
+  const [showChatRooms, setShowChatRooms] = useState(false);
+  const [selectedChatRoom, setSelectedChatRoom] = useState(null);
   
   const menuItems = [
     { label: "홈", icon: "home" },
@@ -36,6 +39,25 @@ const SideMenu = ({ isOpen, onClose, onLoginClick }) => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('username');
     setUsername(null);
+  };
+
+  const handleMenuClick = (label) => {
+    if (label === "채팅") {
+      setShowChatRooms(true);
+    }
+  };
+
+  const handleBackFromChat = () => {
+    setShowChatRooms(false);
+    setSelectedChatRoom(null);
+  };
+
+  const handleSelectChatRoom = (room) => {
+    setSelectedChatRoom(room);
+  };
+
+  const handleCreateChatRoom = (room) => {
+    setSelectedChatRoom(room);
   };
 
   const renderIcon = (icon) => {
@@ -77,6 +99,59 @@ const SideMenu = ({ isOpen, onClose, onLoginClick }) => {
   }
 
   if (!isOpen) return null;
+
+  // Render chat room component if selected
+  if (selectedChatRoom) {
+    return (
+      <div className="fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+        <div className="relative w-4/5 max-w-sm bg-white h-full overflow-auto">
+          <div className="p-4 border-b flex items-center">
+            <button onClick={() => setSelectedChatRoom(null)} className="mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h2 className="text-xl font-medium">{selectedChatRoom.name}</h2>
+          </div>
+          <div className="h-full p-4">
+            {/* Chat messages would go here - this would be another component */}
+            <div className="bg-gray-100 h-5/6 rounded-md flex items-center justify-center text-gray-500">
+              채팅 메시지가 여기에 표시됩니다
+            </div>
+            
+            {/* Message input */}
+            <div className="mt-4 flex">
+              <input
+                type="text"
+                placeholder="메시지 입력..."
+                className="flex-1 border p-2 rounded-l-md"
+              />
+              <button className="bg-orange-500 text-white px-4 py-2 rounded-r-md">
+                전송
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render chat room list if chat is selected
+  if (showChatRooms) {
+    return (
+      <div className="fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+        <div className="relative w-4/5 max-w-sm bg-white h-full overflow-auto">
+          <ChatRoomList 
+            onSelectRoom={handleSelectChatRoom}
+            onCreateRoom={handleCreateChatRoom}
+            onBack={handleBackFromChat}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -140,7 +215,11 @@ const SideMenu = ({ isOpen, onClose, onLoginClick }) => {
         <ul>
           {menuItems.map((item, index) => (
             <li key={index}>
-              <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-100">
+              <a 
+                href="#" 
+                className="flex items-center px-4 py-3 hover:bg-gray-100"
+                onClick={() => handleMenuClick(item.label)}
+              >
                 {renderIcon(item.icon)}
                 <span className="ml-3">{item.label}</span>
               </a>
